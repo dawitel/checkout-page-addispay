@@ -1,27 +1,33 @@
-// app/api/checkout/route.ts
+import { checkoutSchema } from "@/schema";
 import { NextResponse } from "next/server";
-import { z } from "zod";
 
-const checkoutSchema = z.object({
-  item: z.string(),
-  quantity: z.number(),
-  orderId: z.number(),
-  price: z.number(),
-});
 
 export async function POST(request: Request) {
   try {
     const formData = await request.json();
     const validatedData = checkoutSchema.parse(formData);
+    const { Amount, CustBankAcc, CustID, PhoneNumber } = validatedData;
 
-    // Process the order here (e.g., save to database, call payment API)
-    console.log("Order:", validatedData);
-
+    try {
+      await fetch("localhost:8080/api/v1/checkout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          CustID,
+          CustBankAcc,
+          Amount,
+          PhoneNumber,
+        }),
+      });
+      return NextResponse.json({success: true}, {status: 200})
+    } catch (error) {
+      console.log(error)
+      return NextResponse.json({error: "Checkout server is down" }, {status: 500})
+    }
     return NextResponse.json({ success: true }, { status: 200 });
   } catch (error) {
-    if (error instanceof z.ZodError) {
-      return NextResponse.json({ errors: error.issues }, { status: 400 });
-    }
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
