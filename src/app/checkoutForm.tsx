@@ -28,9 +28,15 @@ const CheckoutForm = () => {
       // get the response of the backend 
       try {
         const response = await axios.get("/api/v1/processed-transactions")
+         
         if (response.data.status === "FAILED"){
           router.push(`/checkout-failed/transactionID=${response.data.transactionID}`)
         }
+        
+        if (response.data.status === "EXPIRED"){
+          router.push(`/checkout-failed/transactionID=${response.data.transactionID}`)
+        }
+        
         
         if (response.data.status === "SUCCESS"){
           router.push(`/success/transactionID=${response.data.transactionID}`)     

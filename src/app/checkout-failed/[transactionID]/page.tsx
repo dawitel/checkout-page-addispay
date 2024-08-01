@@ -6,6 +6,7 @@ type params = {
   params: {
     transactionID: string;
   }
+  message: string
 }
 // app/success/page.tsx
 const SuccessPage = ({params}: params) => {
