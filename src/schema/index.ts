@@ -5,7 +5,11 @@ export const checkoutSchema = z.object({
     message: "customer id must be atleast 6 characters",
   }),
   CustBankAcc: z.number(),
-  PhoneNumber: z.number(),
+  Phonenumber: z.number().min(10, {
+    message: "Please enter a valid phone number"
+  }).max(10, {
+    message: "Please enter a valid phone number"
+  }),
   Amount: z
     .number()
     .min(0, {

@@ -1,7 +1,7 @@
 // app/checkout/CheckoutForm.tsx
 "use client";
 
-import { v4 as uuidv4 } from "uuid";
+import axios from "axios"
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -14,24 +14,31 @@ const CheckoutForm = () => {
   const [Amount, setAmount] = useState<number>();
   const router = useRouter();
   const {pending} = useFormStatus()
-
+  const data = {
+    CustID,
+    CustBankAcc,
+    Amount,
+    PhoneNumber,
+  }
   const handleSubmit = async (e: React.FormEvent) => {
     try {
       e.preventDefault();
-      await fetch("/api/checkout", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          CustID,
-          CustBankAcc,
-          Amount,
-          PhoneNumber,
-        }),
-      });
+      await axios.post("/api/v1/checkout",data);
       
-      router.push(`/success/transactionID=${CustID}`)
+      // get the response of the backend 
+      try {
+        const response = await axios.get("/api/v1/processed-transactions")
+        if (response.data.status === "FAILED"){
+          router.push(`/checkout-failed/transactionID=${response.data.transactionID}`)
+        }
+        
+        if (response.data.status === "SUCCESS"){
+          router.push(`/success/transactionID=${response.data.transactionID}`)     
+        }
+
+      } catch (error) {
+        console.log(error)
+      }
     } catch (error) {
       console.log(error)
       router.push(`/checkout-failed/transactionID=${CustID}`)
