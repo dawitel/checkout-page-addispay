@@ -1,11 +1,26 @@
 import axios from "axios";
 import { NextRequest, NextResponse } from "next/server";
 
-export default async function handler(req: NextRequest, res: NextResponse) {
+export async function POST(req: NextRequest, res: NextResponse) {
+  const data = await req.json();
+  const {
+    transaction_id,
+    order_id,
+    cust_id,
+    amount,
+    status,
+    timestamp,
+    message,
+  } = data;
+  console.log("Received data:", data);
   try {
-    if (req.method === "POST") {
-      const data = await req.json();
-      const {
+    //   make API request to the /api/transactions TODO: move form fetch -> axios
+    await axios.post("localhost:3000/api/transactions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
         transaction_id,
         order_id,
         cust_id,
@@ -13,39 +28,9 @@ export default async function handler(req: NextRequest, res: NextResponse) {
         status,
         timestamp,
         message,
-      } = data;
-      console.log("Received data:", data);
-      try {
-          //   make API request to the /api/transactions TODO: move form fetch -> axios
-          await axios.post("localhost:3000/api/transactions", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              transaction_id,
-              order_id,
-              cust_id,
-              amount,
-              status,
-              timestamp,
-              message,
-            }),
-          });
-        
-      } catch (error) {
-        console.log(error)
-      }
-    } else if (req.method === "GET"){ 
-      // return the status of the 
-    } else {
-      return NextResponse.json({
-        message: "Method not supported",
-        status: 403,
-      });
-    }
+      }),
+    });
   } catch (error) {
     console.log(error);
-    return NextResponse.json({ message: "", status: 400 });
   }
 }
