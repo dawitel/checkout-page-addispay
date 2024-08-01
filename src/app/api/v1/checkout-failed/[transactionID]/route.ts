@@ -1,1 +1,1 @@
-export default async function POST() {}
+export async function POST() {}
